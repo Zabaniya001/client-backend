@@ -30,10 +30,10 @@ pub struct Server {
     num_players: Option<u32>,
     #[serde(serialize_with = "serialize_player_map")]
     players: HashMap<SteamID, Player>,
-    #[serde(skip)]
-    player_history: VecDeque<Player>,
     gamemode: Option<Gamemode>,
 
+    #[serde(skip)]
+    player_history: VecDeque<Player>,
     #[serde(skip)]
     player_records: PlayerRecords,
     #[serde(skip)]
@@ -67,7 +67,11 @@ impl Server {
     /// Handles any io output from running commands / reading the console log file.
     /// Returns:
     /// * Some<[SteamID]> of a player if they have been newly added to the server.
-    pub fn handle_io_output(&mut self, response: IOOutput, user: Option<SteamID>) -> NewPlayers {
+    pub(crate) fn handle_io_output(
+        &mut self,
+        response: IOOutput,
+        user: Option<SteamID>,
+    ) -> NewPlayers {
         use IOOutput::*;
         match response {
             NoOutput => {}
@@ -106,7 +110,7 @@ impl Server {
 
     /// Moves any old players from the server into history. Any console commands (status, g15_dumpplayer, etc)
     /// should be run before calling this function again to prevent removing all players from the player list.
-    pub fn refresh(&mut self) {
+    pub(crate) fn refresh(&mut self) {
         // Get old players
         let mut unaccounted_players = Vec::new();
         for (steamid, player) in &self.players {
@@ -143,7 +147,7 @@ impl Server {
 
     /// Add the provided SteamInfo to the given player. Returns true if that player was
     /// found in the server.
-    pub fn insert_steam_info(&mut self, player: SteamID, info: SteamInfo) -> bool {
+    pub(crate) fn insert_steam_info(&mut self, player: SteamID, info: SteamInfo) -> bool {
         let mut found = false;
 
         if let Some(player) = self.players.get_mut(&player) {
@@ -159,7 +163,7 @@ impl Server {
         found
     }
 
-    pub fn update_friends_list(&mut self, friendslist: Vec<Friend>) {
+    pub(crate) fn update_friends_list(&mut self, friendslist: Vec<Friend>) {
         self.friends_list = friendslist;
     }
 

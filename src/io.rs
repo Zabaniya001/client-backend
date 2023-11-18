@@ -26,7 +26,7 @@ pub mod regexes;
 // Enums
 
 #[derive(Debug)]
-pub enum IOOutput {
+pub(crate) enum IOOutput {
     NoOutput,
     Status(StatusLine),
     MultiStatus(Vec<StatusLine>),
@@ -71,7 +71,7 @@ impl Display for Commands {
 
 // IOThread
 
-pub struct IOManager {
+pub(crate) struct IOManager {
     command_recv: UnboundedReceiver<Commands>,
     command_send: UnboundedSender<Commands>,
     command_manager: CommandManager,
